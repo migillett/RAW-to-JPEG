@@ -27,6 +27,5 @@ def raw_to_jpeg(folder, auto_wb=True, auto_exp=True):
 
 if __name__ == '__main__':
     # put the starting directory here:
-    folder = 'F:\PHOTOS'
-    
-    raw_to_jpeg(folder)
+    photos_folder = 'F:\PHOTOS'
+    raw_to_jpeg(photos_folder)
