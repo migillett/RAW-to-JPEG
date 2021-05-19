@@ -3,8 +3,9 @@ import imageio
 import os.path
 
 
-def raw_to_jpeg(folder):
+def raw_to_jpeg(folder, auto_wb=True, auto_exp=True):
     extensions = ['.CR2', '.ARW']
+    images_processed = 0
 
     for directory, subdirectory, files in os.walk(folder):
         for file in files:
@@ -14,10 +15,14 @@ def raw_to_jpeg(folder):
                     converted_path = f'{os.path.splitext(photo_path)[0]}.jpg'
                     if not os.path.exists(converted_path):
                         with rawpy.imread(photo_path) as raw:
-                            rgb = raw.postprocess()
+                            rgb = raw.postprocess(no_auto_bright=auto_exp, use_auto_wb=auto_wb)
                         imageio.imsave(converted_path, rgb)
                         print('Converted image:', converted_path)
-    print('Done.')
+                        images_processed += 1
+                    else:
+                        print('Image already exported:', converted_path)
+
+    print('Export Complete. Images processed:', images_processed)
 
 
 if __name__ == '__main__':
