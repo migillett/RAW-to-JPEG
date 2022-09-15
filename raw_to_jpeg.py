@@ -6,6 +6,8 @@ import multiprocessing
 
 # https://www.pythontutorial.net/python-concurrency/python-multiprocessing/
 
+# /Volumes/UniversityBroadcasting/Tim_Archives/2005
+
 
 class RawToJpeg():
     def __init__(self, image_folder, delete_old=False, replace=False) -> None:
@@ -13,37 +15,57 @@ class RawToJpeg():
         self.replace = replace
 
         if self.delete_old:
-            print('\nWARNING: the program is currently configured to delete old images. Are you sure?\n')
-            confirm = input('Are you sure? (y/n):')
+            print('\nWARNING: the program is currently configured to delete old images. Are you sure?')
+            confirm = input('Continue? (y/n): ')
             if confirm != 'y':
                 exit('\Conversion cancelled.\n')
     
         self.image_folder = image_folder
+        self.init_size = self.get_folder_stats(self.image_folder)
 
         self.extensions = ('.CR2', '.ARW', '.NEF', '.nef', '.cr2', '.arw', '.DNG', '.dng')
 
-        processes = []
+        try:
+            photo_files = []
 
-        images_processed = 0
+            pool = multiprocessing.Pool()
 
-        for directory, _, files in walk(self.image_folder):
-            for file in files:
-                if file.endswith(self.extensions):
+            for directory, _, files in walk(self.image_folder):
+                for file in files:
                     filepath = path.join(directory, file)
-                    processes.append(multiprocessing.Process(target=self.convert_image, args=[filepath]))
+
+                    if file.endswith(self.extensions):
+                        # self.convert_image(photo_path=filepath)
+                        photo_files.append(filepath)
+
+                    # delete the annoying XML files
+                    elif file.endswith('.xml') and self.delete_old:
+                        remove(filepath)
+
+            print(f'Converting {len(photo_files)} images to JPEG.')
+            pool.map(self.convert_image, photo_files)
+
+            print(f'\nConversion complete.')
         
-        print(f'Added {len(processes)} images for conversion.')
-
-        print('Starting conversion...')
+        except KeyboardInterrupt:
+            print(f'Conversion cancelled.')
         
-        for process in processes:
-            process.start()
+        self.final_size = self.get_folder_stats(self.image_folder)
+        print(f'\nInitial Folder Size: {round(self.init_size/1000000, 2)} MB\nFinal Folder Size: {round(self.final_size/1000000, 2)} MB\n')
+        print(f'{self.percent_change()}% reduction in final directory size')
 
-        for process in processes:
-            process.join()
-            images_processed += 1
+    def get_folder_stats(self, directory):
+        size = 0
+        for directory, _, files in walk(directory):
+            for file in files:
 
-        print(f'Conversion complete. {images_processed} images processed')
+                filepath = path.join(directory, file)
+                size += path.getsize(filepath)
+        return size
+
+    def percent_change(self):
+        p_c = ((self.init_size - self.final_size) / self.init_size) * 100
+        return round(p_c, 2)
 
     def convert_image(self, photo_path):
         converted_path = f'{path.splitext(photo_path)[0]}.jpg'
@@ -63,9 +85,9 @@ class RawToJpeg():
             except Exception as e:
                 print(f'Error loading file {photo_path}')
 
-            if self.delete_old:
-                # print(f'Deleted file: {photo_path}')
-                remove(photo_path)
+        if self.delete_old:
+            # print(f'Deleted file: {photo_path}')
+            remove(photo_path)
 
 if __name__ == '__main__':
-    RawToJpeg(image_folder=str(input('\nPhotos Folder: ')), delete_old=True)
+    RawToJpeg(image_folder=str(input('\nPhotos Folder: ')), delete_old=True, replace=True)
