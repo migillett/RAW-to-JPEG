@@ -2,7 +2,7 @@ import rawpy
 import imageio
 from os import path, walk, remove
 from sys import exit
-import multiprocessing
+from multiprocessing import Pool
 
 class RawToJpeg():
     def __init__(self, image_folder, delete_old=False, replace=False) -> None:
@@ -23,8 +23,6 @@ class RawToJpeg():
         try:
             photo_files = []
 
-            pool = multiprocessing.Pool()
-
             for directory, _, files in walk(self.image_folder):
                 for file in files:
                     filepath = path.join(directory, file)
@@ -38,6 +36,8 @@ class RawToJpeg():
                         remove(filepath)
 
             print(f'Converting {len(photo_files)} images to JPEG.')
+
+            pool = Pool()
             pool.map(self.convert_image, photo_files)
 
             print(f'\nConversion complete.')
