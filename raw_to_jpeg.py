@@ -4,11 +4,6 @@ from os import path, walk, remove
 from sys import exit
 import multiprocessing
 
-# https://www.pythontutorial.net/python-concurrency/python-multiprocessing/
-
-# /Volumes/UniversityBroadcasting/Tim_Archives/2005
-
-
 class RawToJpeg():
     def __init__(self, image_folder, delete_old=False, replace=False) -> None:
         self.delete_old = delete_old
