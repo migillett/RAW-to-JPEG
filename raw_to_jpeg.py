@@ -1,11 +1,11 @@
 import rawpy
 import imageio
-from os import path, walk, remove
+from os import listdir, path, walk, remove
 from sys import exit
 from multiprocessing import Pool
 
 class RawToJpeg():
-    def __init__(self, image_folder, delete_old=False, replace=False) -> None:
+    def __init__(self, image_folder, delete_old=False, replace=False):
         self.delete_old = delete_old
         self.replace = replace
 
@@ -47,7 +47,7 @@ class RawToJpeg():
         
         self.final_size = self.get_folder_stats(self.image_folder)
         print(f'\nInitial Folder Size: {round(self.init_size/1000000, 2)} MB\nFinal Folder Size: {round(self.final_size/1000000, 2)} MB\n')
-        print(f'{self.percent_change()}% reduction in final directory size')
+        print(f'{self.percent_change()}% reduction in final directory size\n')
 
     def get_folder_stats(self, directory):
         size = 0
