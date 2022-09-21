@@ -46,7 +46,10 @@ class RawToJpeg():
             print(f'Conversion cancelled.')
         
         self.final_size = self.get_folder_stats(self.image_folder)
-        print(f'\nInitial Folder Size: {round(self.init_size/1000000, 2)} MB\nFinal Folder Size: {round(self.final_size/1000000, 2)} MB\n')
+        print(f'''
+Initial Folder Size: {round(self.init_size/1000000, 2)} MB
+Final Folder Size: {round(self.final_size/1000000, 2)} MB
+''')
         print(f'{self.percent_change()}% reduction in final directory size\n')
 
     def get_folder_stats(self, directory):
