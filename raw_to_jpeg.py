@@ -3,6 +3,14 @@ import imageio
 from os import listdir, path, walk, remove
 from sys import exit
 from multiprocessing import Pool
+from argparse import ArgumentParser, BooleanOptionalAction
+
+
+parser = ArgumentParser(description='Set configurations to convert RAW images to JPEG')
+parser.add_argument('-d', '--directory', dest='directory', type=str, nargs=1, help='Folderpath of where your photos are stored')
+parser.add_argument('-r', '--remove', dest='remove_old', default=False, action=BooleanOptionalAction, help='Removes RAW files once JPEG images are made.')
+parser.add_argument('-o', '--overwrite', dest='overwrite', default=False, action=BooleanOptionalAction, help='Overwrites image files if they already exist')
+args = parser.parse_args()
 
 class RawToJpeg():
     def __init__(self, image_folder, delete_old=False, replace=False):
@@ -88,4 +96,9 @@ Final Folder Size: {round(self.final_size/1000000, 2)} MB
             remove(photo_path)
 
 if __name__ == '__main__':
-    RawToJpeg(image_folder=str(input('\nPhotos Folder: ')), delete_old=True, replace=True)
+    try:
+        d = args.directory[0]
+    except TypeError:
+        d = str(input('\nPhotos Folder: '))
+
+    RawToJpeg(image_folder=d, delete_old=args.remove_old, replace=args.overwrite)
